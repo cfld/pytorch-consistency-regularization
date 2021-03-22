@@ -6,7 +6,7 @@ def get_args():
     # dataset config
     parser.add_argument("--root", "-r", default="./data", type=str, help="/path/to/dataset")
     parser.add_argument("--dataset", "-d", default="cifar10", choices=['stl10', 'svhn', 'cifar10', 'cifar100'], type=str, help="dataset name")
-    parser.add_argument("--num_labels", default=4000, type=int, help="number of labeled data")
+    parser.add_argument("--num_labels", default=6, type=int, help="number of labeled data")
     parser.add_argument("--val_ratio", default=0.1, type=float, help="the ratio of evaluation data to training data.")
     parser.add_argument("--random_split", action="store_true", help="random sampleing from training data for validation")
     parser.add_argument("--num_workers", default=8, type=int, help="number of thread for CPU parallel")
@@ -18,6 +18,7 @@ def get_args():
     parser.add_argument("--wa", default="t.t.f", type=str, help="transformations (flip, crop, noise) for weak augmentation. t and f indicate true and false.")
     parser.add_argument("--strong_aug", action="store_true", help="use strong augmentation (RandAugment) for unlabeled data")
     # optimization config
+
     parser.add_argument("--model", default="wrn", choices=['wrn', 'shake', 'cnn13'], type=str, help="model architecture")
     parser.add_argument("--ul_batch_size", "-ul_bs", default=50, type=int, help="mini-batch size of unlabeled data")
     parser.add_argument("--l_batch_size", "-l_bs", default=50, type=int, help="mini-batch size of labeled data")
@@ -25,7 +26,7 @@ def get_args():
     parser.add_argument("--lr", default=3e-2, type=float, help="learning rate")
     parser.add_argument("--weight_decay", "-wd", default=0.0005, type=float, help="weight decay")
     parser.add_argument("--momentum", default=0.9, type=float, help="momentum for sgd or beta_1 for adam")
-    parser.add_argument("--iteration", default=500000, type=int, help="number of training iteration")
+    parser.add_argument("--iteration", default=10000, type=int, help="number of training iteration")
     parser.add_argument("--lr_decay", default="cos", choices=['cos', 'step'], type=str, help="way to decay learning rate")
     parser.add_argument("--lr_decay_rate", default=0.2, type=float, help="decay rate for step lr decay")
     parser.add_argument("--only_validation", action="store_true", help="only training and validation for hyperparameter tuning")
@@ -64,4 +65,12 @@ def get_args():
     parser.add_argument("--out_dir", default="log", type=str, help="output directory")
     parser.add_argument("--seed", default=96, type=int, help="random seed")
     parser.add_argument("--disp", default=256, type=int, help="display loss every N")
+
+
+    # tagged on by zeek
+    parser.add_argument("--epochs",  default=10, type=int)
+    parser.add_argument("--in_dims", default=2, type=int)
+    parser.add_argument("--num_classes", default=2, type=int)
+    parser.add_argument("--hidden_dims", default=256, type=int)
+
     return parser.parse_args()

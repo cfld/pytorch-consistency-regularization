@@ -120,6 +120,9 @@ def fit(cfg):
     else:
         device = "cpu"
 
+    # - 
+    # Model
+
     model = gen_model().to(device)
     model.train()
 
@@ -130,11 +133,10 @@ def fit(cfg):
     # set consistency type
     consistency = gen_consistency(cfg.consistency, cfg)
     # set ssl algorithm
-    ssl_alg = gen_ssl_alg(
-        cfg.alg,
-        cfg
-    )
+    ssl_alg = gen_ssl_alg(cfg.alg, cfg)
 
+    # -
+    # Data
     l0_data, l1_data, u_data, label = gen_ssl_moon_dataset(
         cfg.seed, cfg.n_sample, cfg.n_labeled, cfg.noise_factor
     )
@@ -155,11 +157,11 @@ def fit(cfg):
             unlabeled_weak1,
             unlabeled_weak2], 0)
 
-        outputs = model(all_data)
+        outputs        = model(all_data)
         labeled_logits = outputs[:tch_labeled_data.shape[0]]
-        loss = F.cross_entropy(labeled_logits, label)
+        loss           = F.cross_entropy(labeled_logits, label)
         if cfg.coef > 0:
-            unlabeled_logits, unlabeled_logits_target = torch.chunk(outputs[tch_labeled_data.shape[0]:], 2, dim=2)
+            unlabeled_logits, unlabeled_logits_target = torch.chunk(outputs[tch_labeled_data.shape[0]:], 2, dim=0)
 
             y, targets, mask = ssl_alg(
                 stu_preds = unlabeled_logits,
@@ -185,7 +187,7 @@ def fit(cfg):
         loss.backward()
         optimizer.step()
 
-    scatter_plot_with_confidence(l0_data, l1_data, all_data, model, device, cfg.out_dir, cfg.vis_data)
+    scatter_plot_with_confidence(l0_data, l1_data, all_data.cpu(), model, device, cfg.out_dir, cfg.vis_data)
 
 
 if __name__ == "__main__":
@@ -227,5 +229,5 @@ if __name__ == "__main__":
     parser.add_argument("--vis_data", action="store_true", help="visualize input data")
 
     args = parser.parse_args()
-
+    os.makedirs(args.out_dir, exist_ok = True)
     fit(args)
